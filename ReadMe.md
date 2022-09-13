@@ -17,4 +17,4 @@ Right click on the Tray in the icon to view the status of each service.
 
 
 The application is best run by placing a shortcut in your startup folder:
-    \\Users\{UserName}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
+    \\\\Users\\{UserName}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
