@@ -54,7 +54,7 @@
             this.colService});
             this.lvwLog.Location = new System.Drawing.Point(12, 12);
             this.lvwLog.Name = "lvwLog";
-            this.lvwLog.Size = new System.Drawing.Size(539, 469);
+            this.lvwLog.Size = new System.Drawing.Size(586, 469);
             this.lvwLog.SmallImageList = this.imageListStatuses;
             this.lvwLog.TabIndex = 0;
             this.lvwLog.UseCompatibleStateImageBehavior = false;
@@ -70,16 +70,18 @@
             // 
             this.colHttpStatus.Text = "Status";
             this.colHttpStatus.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.colHttpStatus.Width = 80;
+            this.colHttpStatus.Width = 130;
             // 
             // colTimestamp
             // 
             this.colTimestamp.Text = "Timestamp";
+            this.colTimestamp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.colTimestamp.Width = 150;
             // 
             // colService
             // 
             this.colService.Text = "Service Name";
+            this.colService.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.colService.Width = 240;
             // 
             // imageListStatuses
@@ -89,11 +91,12 @@
             this.imageListStatuses.TransparentColor = System.Drawing.Color.Transparent;
             this.imageListStatuses.Images.SetKeyName(0, "StatusOK.png");
             this.imageListStatuses.Images.SetKeyName(1, "StatusInvalid.png");
+            this.imageListStatuses.Images.SetKeyName(2, "StatusWarning.png");
             // 
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClear.Location = new System.Drawing.Point(426, 500);
+            this.btnClear.Location = new System.Drawing.Point(473, 500);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(125, 29);
             this.btnClear.TabIndex = 1;
@@ -105,6 +108,7 @@
             // serviceStatusIcon
             // 
             this.serviceStatusIcon.ContextMenuStrip = this.contextMenu;
+            this.serviceStatusIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("serviceStatusIcon.Icon")));
             this.serviceStatusIcon.Visible = true;
             // 
             // contextMenu
@@ -116,7 +120,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(561, 541);
+            this.ClientSize = new System.Drawing.Size(608, 541);
             this.Controls.Add(this.btnClear);
             this.Controls.Add(this.lvwLog);
             this.Name = "Form1";

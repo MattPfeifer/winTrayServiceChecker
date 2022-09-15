@@ -10,10 +10,26 @@
 
   <ItemGroup>
     <None Remove="appSettings.json" />
+    <None Remove="Images\StatusInvalid.png" />
+    <None Remove="Images\StatusOK.png" />
+    <None Remove="Images\StatusPending.png" />
+    <None Remove="Images\StatusWarning.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="appSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\StatusInvalid.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\StatusOK.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\StatusPending.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\StatusWarning.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -37,10 +53,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Images\" />
   </ItemGroup>
 
 </Project>

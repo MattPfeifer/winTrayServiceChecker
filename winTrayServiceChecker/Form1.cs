@@ -9,6 +9,7 @@ namespace winTrayServiceChecker
     public partial class Form1 : Form
     {
         ServiceSettings settings = new ServiceSettings();
+        bool serviceDown = false;
 
         public Form1()
         {
@@ -26,7 +27,7 @@ namespace winTrayServiceChecker
             }
 
             CheckServices();
-            timerCheckServices.Interval = settings.Interval * 60* 1000 ;
+            timerCheckServices.Interval = settings.Interval * 60 * 1000 ;
             timerCheckServices.Tick += TimerCheckServices_Tick;
             timerCheckServices.Start();
         }
@@ -38,25 +39,40 @@ namespace winTrayServiceChecker
 
         async private Task CheckServices()
         {
-            bool serviceDown = false;
             contextMenu.Items.Clear();
             foreach(ServiceEndpoint endpoint in settings.ServiceEndpoints)
             {
-                HttpResponseMessage httpResponseMessage = await CallEndpoint(endpoint);
+                string imageToastUri; 
 
-                var rand = new Random();
-                var num = rand.Next(0, 100);
-                if (num > 90) httpResponseMessage.StatusCode = System.Net.HttpStatusCode.NotFound;
-
-                if (!httpResponseMessage.IsSuccessStatusCode)
+                HttpResponseMessage httpResponseMessage;
+                try
+                {
+                    httpResponseMessage = await CallEndpoint(endpoint);
+                    if (!httpResponseMessage.IsSuccessStatusCode)
+                    {
+                        serviceDown = true;
+                        imageToastUri = Path.GetFullPath(@"Images\StatusInvalid.png");
+                        ShowToast($"Unable to access {endpoint.Name}", $"Status Code: {httpResponseMessage.StatusCode}", endpoint.Url, imageToastUri);
+                    }
+                }
+                catch(Exception ex)
                 {
                     serviceDown = true;
-                    ShowToast($"Unable to access {endpoint.Name}", $"Statue Code: {httpResponseMessage.StatusCode}", endpoint.Url);
+                    imageToastUri = Path.GetFullPath(@"Images\StatusWarning.png");
+                    httpResponseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout);
+                    ShowToast($"Unable to access {endpoint.Name}", $"Status Code: {httpResponseMessage.StatusCode}", endpoint.Url, imageToastUri);
                 }
-
+                    
                 //update icon in log and menu
                 ReloadEndpoint(endpoint, httpResponseMessage);
                 serviceStatusIcon.Icon = serviceDown ? Resources.iconInvalid : Resources.iconOK;
+
+                //Trim to 1000 entries, just in case
+                int itemCount = lvwLog.Items.Count;
+                for (int i = itemCount - 1; i >= 1000; i--)
+                {
+                    lvwLog.Items.RemoveAt(i);
+                }
             }
 
             contextMenu.Items.Add(new ToolStripSeparator());
@@ -91,17 +107,29 @@ namespace winTrayServiceChecker
 
         private void ReloadEndpoint(ServiceEndpoint endpoint, HttpResponseMessage httpResponseMessage)
         {
-            int imageIndex = httpResponseMessage.IsSuccessStatusCode ? 0 : 1;
+            int imageIndex = httpResponseMessage.IsSuccessStatusCode ? 0 :
+                (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.RequestTimeout) ? 2 : 1;
             ListViewItem item = new ListViewItem(string.Empty, imageIndex) {  Name = endpoint.Name };
             item.SubItems.Add(httpResponseMessage.StatusCode.ToString());
             item.SubItems.Add(DateTime.Now.ToString());
             item.SubItems.Add(endpoint.Name);
-            lvwLog.Items.Add(item);
-            //lvwLog.Items.Insert(0, item);
-
-            Image imageStatus = httpResponseMessage.IsSuccessStatusCode ? Resources.StatusOK : Resources.StatusInvalid;
+            lvwLog.Items.Insert(0, item);
+            Image imageStatus;
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                imageStatus = Resources.StatusOK;
+            }
+            else if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+            {
+                imageStatus = Resources.StatusWarning;
+            }
+            else
+            {
+                imageStatus = Resources.StatusInvalid;
+            }
             ToolStripMenuItem menuItem = new ToolStripMenuItem() { Text = endpoint.Name, ToolTipText = endpoint.Url, Image = imageStatus };
             menuItem.Tag = endpoint;
+            menuItem.ToolTipText = httpResponseMessage.ReasonPhrase;
             menuItem.Click += MenuItem_Click;
             contextMenu.Items.Insert(0, menuItem);
         }
@@ -128,12 +156,14 @@ namespace winTrayServiceChecker
             lvwLog.Items.Clear();
         }
 
-        private static void ShowToast(string title, string message, string message2 = "")
+        private static void ShowToast(string title, string message, string message2, string toastImagePath)
         {
             ToastContentBuilder toast = new ToastContentBuilder()
                 .AddText(title)
                 .AddText(message)
-                .AddText(message2);
+                .AddText(message2)
+                .AddAppLogoOverride(new Uri(toastImagePath))
+                .SetToastDuration(ToastDuration.Short);
             toast.Show();
         }
 

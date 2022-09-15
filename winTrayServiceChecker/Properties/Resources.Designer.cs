@@ -81,6 +81,26 @@ namespace winTrayServiceChecker.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon iconPending {
+            get {
+                object obj = ResourceManager.GetObject("iconPending", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon iconWarning {
+            get {
+                object obj = ResourceManager.GetObject("iconWarning", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap StatusInvalid {
@@ -96,6 +116,16 @@ namespace winTrayServiceChecker.Properties {
         internal static System.Drawing.Bitmap StatusOK {
             get {
                 object obj = ResourceManager.GetObject("StatusOK", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap StatusPending {
+            get {
+                object obj = ResourceManager.GetObject("StatusPending", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
