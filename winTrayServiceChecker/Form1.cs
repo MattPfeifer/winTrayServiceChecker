@@ -182,5 +182,10 @@ namespace winTrayServiceChecker
                 serviceStatusIcon.Dispose(); 
             }
         }
+
+        private void serviceStatusIcon_Click(object sender, EventArgs e)
+        {
+            serviceStatusIcon.ShowBalloonTip(5);
+        }
     }
 }

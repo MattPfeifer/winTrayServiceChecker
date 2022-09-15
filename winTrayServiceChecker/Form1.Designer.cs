@@ -107,9 +107,14 @@
             // 
             // serviceStatusIcon
             // 
+            this.serviceStatusIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.serviceStatusIcon.BalloonTipText = "Keep an eye on the services you depend upon.";
+            this.serviceStatusIcon.BalloonTipTitle = "Service Checker";
             this.serviceStatusIcon.ContextMenuStrip = this.contextMenu;
             this.serviceStatusIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("serviceStatusIcon.Icon")));
+            this.serviceStatusIcon.Text = "Service Checker";
             this.serviceStatusIcon.Visible = true;
+            this.serviceStatusIcon.Click += new System.EventHandler(this.serviceStatusIcon_Click);
             // 
             // contextMenu
             // 
