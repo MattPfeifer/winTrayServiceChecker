@@ -69,19 +69,16 @@
             // colHttpStatus
             // 
             this.colHttpStatus.Text = "Status";
-            this.colHttpStatus.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.colHttpStatus.Width = 130;
             // 
             // colTimestamp
             // 
             this.colTimestamp.Text = "Timestamp";
-            this.colTimestamp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.colTimestamp.Width = 150;
             // 
             // colService
             // 
             this.colService.Text = "Service Name";
-            this.colService.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.colService.Width = 240;
             // 
             // imageListStatuses
@@ -114,7 +111,7 @@
             this.serviceStatusIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("serviceStatusIcon.Icon")));
             this.serviceStatusIcon.Text = "Service Checker";
             this.serviceStatusIcon.Visible = true;
-            this.serviceStatusIcon.Click += new System.EventHandler(this.serviceStatusIcon_Click);
+            this.serviceStatusIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.serviceStatusIcon_MouseDoubleClick);
             // 
             // contextMenu
             // 

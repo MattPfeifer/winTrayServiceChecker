@@ -11,6 +11,9 @@ namespace winTrayServiceChecker
         ServiceSettings settings = new ServiceSettings();
         bool serviceDown = false;
 
+        int checkIntervalNormal = 30 * 60 * 1000;   //default to 30 minutes
+        int checkIntervalError = 5 * 60 * 1000;   //default to 5 minutes
+
         public Form1()
         {
             InitializeComponent();
@@ -26,8 +29,19 @@ namespace winTrayServiceChecker
                 settings = JsonConvert.DeserializeObject<ServiceSettings>(json);
             }
 
+            if (settings?.Interval != null && settings.Interval > 0)
+            { 
+                checkIntervalNormal = settings.Interval * 60 * 1000;
+            }
             CheckServices();
-            timerCheckServices.Interval = settings.Interval * 60 * 1000 ;
+            //Task.Run(async () => await CheckServices());
+
+            StartChecker();
+        }
+
+        private void StartChecker()
+        {
+            timerCheckServices.Interval = checkIntervalNormal;
             timerCheckServices.Tick += TimerCheckServices_Tick;
             timerCheckServices.Start();
         }
@@ -39,32 +53,42 @@ namespace winTrayServiceChecker
 
         async private Task CheckServices()
         {
+            bool serviceFailedThisTimeAround = false;   //keep track of the current loop through the services,
+                                                        //if they are all up, change the service mode back
             contextMenu.Items.Clear();
             foreach(ServiceEndpoint endpoint in settings.ServiceEndpoints)
             {
                 string imageToastUri; 
 
-                HttpResponseMessage httpResponseMessage;
+                HttpResponseMessage httpResponseMessage = null;
                 try
                 {
                     httpResponseMessage = await CallEndpoint(endpoint);
                     if (!httpResponseMessage.IsSuccessStatusCode)
                     {
-                        serviceDown = true;
-                        imageToastUri = Path.GetFullPath(@"Images\StatusInvalid.png");
-                        ShowToast($"Unable to access {endpoint.Name}", $"Status Code: {httpResponseMessage.StatusCode}", endpoint.Url, imageToastUri);
+                        if (!serviceDown)
+                        {
+                            imageToastUri = Path.GetFullPath(@"Images\StatusInvalid.png");
+                            serviceDown = true;
+                            serviceFailedThisTimeAround = true;
+                            ChangeServiceMode($"Unable to access a configured service", $"Status Code: {httpResponseMessage.StatusCode}", endpoint.Url, imageToastUri);
+                        }
                     }
                 }
                 catch(Exception ex)
                 {
-                    serviceDown = true;
-                    imageToastUri = Path.GetFullPath(@"Images\StatusWarning.png");
                     httpResponseMessage = new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout);
-                    ShowToast($"Unable to access {endpoint.Name}", $"Status Code: {httpResponseMessage.StatusCode}", endpoint.Url, imageToastUri);
+                    if (!serviceDown)
+                    {
+                        imageToastUri = Path.GetFullPath(@"Images\StatusWarning.png");
+                        serviceDown = true;
+                        serviceFailedThisTimeAround = true;
+                        ChangeServiceMode($"Unable to access a configured service", $"{ex.Message}", endpoint.Url, imageToastUri);
+                    }
                 }
                     
                 //update icon in log and menu
-                ReloadEndpoint(endpoint, httpResponseMessage);
+                UpdateUI(endpoint, httpResponseMessage);
                 serviceStatusIcon.Icon = serviceDown ? Resources.iconInvalid : Resources.iconOK;
 
                 //Trim to 1000 entries, just in case
@@ -75,6 +99,12 @@ namespace winTrayServiceChecker
                 }
             }
 
+            if (serviceFailedThisTimeAround)
+            {
+                serviceDown = false;
+                string imageToastUri = Path.GetFullPath(@"Images\StatusOK.png");
+                ChangeServiceMode("Services restored", "All configured services are available.", "", imageToastUri);
+            }
             contextMenu.Items.Add(new ToolStripSeparator());
             ToolStripMenuItem menuLogs = new ToolStripMenuItem("View Logs");
             menuLogs.Click += MenuLogs_Click;
@@ -83,6 +113,23 @@ namespace winTrayServiceChecker
             menuExit.Click += MenuExit_Click;
             contextMenu.Items.Add(menuExit);
 
+        }
+
+        private void ChangeServiceMode(string title, string message1, string serviceUrl, string toastImagePath)
+        {
+            if (serviceDown)
+            {
+                ShowToast(title, message1, serviceUrl, toastImagePath);
+                timerCheckServices.Stop();
+                timerCheckServices.Interval = checkIntervalError;
+                timerCheckServices.Start();
+            }
+            else
+            {
+                timerCheckServices.Stop();
+                timerCheckServices.Interval = checkIntervalNormal;
+                timerCheckServices.Start();
+            }
         }
 
         private void MenuExit_Click(object? sender, EventArgs e)
@@ -105,7 +152,7 @@ namespace winTrayServiceChecker
             return response;
         }
 
-        private void ReloadEndpoint(ServiceEndpoint endpoint, HttpResponseMessage httpResponseMessage)
+        private void UpdateUI(ServiceEndpoint endpoint, HttpResponseMessage httpResponseMessage)
         {
             int imageIndex = httpResponseMessage.IsSuccessStatusCode ? 0 :
                 (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.RequestTimeout) ? 2 : 1;
@@ -156,12 +203,12 @@ namespace winTrayServiceChecker
             lvwLog.Items.Clear();
         }
 
-        private static void ShowToast(string title, string message, string message2, string toastImagePath)
+        private static void ShowToast(string title, string message, string serviceUrl, string toastImagePath)
         {
             ToastContentBuilder toast = new ToastContentBuilder()
                 .AddText(title)
                 .AddText(message)
-                .AddText(message2)
+                .AddText(serviceUrl)
                 .AddAppLogoOverride(new Uri(toastImagePath))
                 .SetToastDuration(ToastDuration.Short);
             toast.Show();
@@ -183,7 +230,7 @@ namespace winTrayServiceChecker
             }
         }
 
-        private void serviceStatusIcon_Click(object sender, EventArgs e)
+        private void serviceStatusIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             serviceStatusIcon.ShowBalloonTip(5);
         }
