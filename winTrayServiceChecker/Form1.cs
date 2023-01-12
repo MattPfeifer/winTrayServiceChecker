@@ -109,10 +109,21 @@ namespace winTrayServiceChecker
             ToolStripMenuItem menuLogs = new ToolStripMenuItem("View Logs");
             menuLogs.Click += MenuLogs_Click;
             contextMenu.Items.Add(menuLogs);
+            ToolStripMenuItem menuRefresh = new ToolStripMenuItem("Refresh");
+            menuRefresh.Click += MenuRefresh_Click;
+            contextMenu.Items.Add(menuRefresh);
+            contextMenu.Items.Add(new ToolStripSeparator());
             ToolStripMenuItem menuExit = new ToolStripMenuItem("Exit");
             menuExit.Click += MenuExit_Click;
             contextMenu.Items.Add(menuExit);
 
+        }
+
+        async private void MenuRefresh_Click(object? sender, EventArgs e)
+        {
+            timerCheckServices.Enabled = false;
+            await CheckServices();
+            timerCheckServices.Enabled = true;
         }
 
         private void ChangeServiceMode(string title, string message1, string serviceUrl, string toastImagePath)
