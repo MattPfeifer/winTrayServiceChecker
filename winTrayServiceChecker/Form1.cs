@@ -113,10 +113,20 @@ namespace winTrayServiceChecker
             menuRefresh.Click += MenuRefresh_Click;
             contextMenu.Items.Add(menuRefresh);
             contextMenu.Items.Add(new ToolStripSeparator());
+
+            ToolStripMenuItem menuHelp = new ToolStripMenuItem("Help");
+            menuHelp.Click += MenuHelp_Click;
+            contextMenu.Items.Add(menuHelp);
             ToolStripMenuItem menuExit = new ToolStripMenuItem("Exit");
             menuExit.Click += MenuExit_Click;
             contextMenu.Items.Add(menuExit);
 
+        }
+
+        private void MenuHelp_Click(object? sender, EventArgs e)
+        {
+            string url = "https://hyland.atlassian.net/l/cp/t931219Y";
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
         }
 
         async private void MenuRefresh_Click(object? sender, EventArgs e)

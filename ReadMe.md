@@ -20,5 +20,9 @@ The application is best run by placing a shortcut in your startup folder:
     \\\\Users\\{UserName}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
 
 
-Change Log:
-2023.01.12 - Added refresh option to menu
+Change Log
+2023.01.12
+-----------
+Added refresh option to menu
+Added installer
+Added help link to confluence
